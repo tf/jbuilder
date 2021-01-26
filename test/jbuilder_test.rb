@@ -566,6 +566,20 @@ class JbuilderTest < ActiveSupport::TestCase
     assert_equal 'one', result['level1']
   end
 
+  test 'key_format! can be changed in child elements' do
+    result = jbuild do |json|
+      json.key_format! camelize: :lower
+
+      json.level_one do
+        json.key_format! :upcase
+        json.value 'two'
+      end
+    end
+
+    assert_equal ['levelOne'], result.keys
+    assert_equal ['VALUE'], result['levelOne'].keys
+  end
+
   test 'key_format! with no parameter' do
     result = jbuild do |json|
       json.key_format! :upcase
