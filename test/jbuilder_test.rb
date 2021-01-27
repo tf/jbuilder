@@ -729,6 +729,45 @@ class JbuilderTest < ActiveSupport::TestCase
     assert_empty cache
   end
 
+  test 'applying key_format! deeply can be disabled' do
+    names = { first_name: 'camel', last_name: 'case' }
+    result = jbuild do |json|
+      json.key_format! camelize: :lower
+      json.deep_format_keys! false
+      json.set! :all_names, names
+    end
+
+    assert_equal %i[first_name last_name], result['allNames'].keys
+  end
+
+  test 'applying key_format! deeply can be disabled per scope' do
+    names = { first_name: 'camel', last_name: 'case' }
+    result = jbuild do |json|
+      json.key_format! camelize: :lower
+      json.scope do
+        json.deep_format_keys! false
+        json.set! :all_names, names
+      end
+      json.set! :all_names, names
+    end
+
+    assert_equal %i[first_name last_name], result['scope']['allNames'].keys
+    assert_equal %w[firstName lastName], result['allNames'].keys
+  end
+
+  test 'applying key_format! deeply can be disabled globally' do
+    names = { first_name: 'camel', last_name: 'case' }
+
+    Jbuilder.deep_format_keys false
+    result = jbuild do |json|
+      json.key_format! camelize: :lower
+      json.set! :all_names, names
+    end
+
+    assert_equal %i[first_name last_name], result['allNames'].keys
+    Jbuilder.send(:class_variable_set, '@@deep_format_keys', true)
+  end
+
   test 'ignore_nil! without a parameter' do
     result = jbuild do |json|
       json.ignore_nil!

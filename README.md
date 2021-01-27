@@ -274,6 +274,33 @@ environment.rb for example):
 Jbuilder.key_format camelize: :lower
 ```
 
+Since version 2.11, key format is also applied to nested hashes that
+are passed as values:
+
+``` ruby
+json.key_format! camelize: :lower
+json.settings({some_value: "abc"})
+
+# => { "settings": { "someValue": "abc" }}
+```
+
+If you'd like to preserve the previous behavior, you can opt out:
+
+``` ruby
+json.key_format! camelize: :lower
+json.deep_format_keys! false
+json.settings({some_value: "abc"})
+
+# => { "settings": { "some_value": "abc" }}
+```
+
+You can set this globally with the class method `deep_format_keys` (from inside your
+environment.rb for example):
+
+``` ruby
+Jbuilder.deep_format_keys false
+```
+
 ## Contributing to Jbuilder
 
 Jbuilder is the work of many contributors. You're encouraged to submit pull requests, propose
